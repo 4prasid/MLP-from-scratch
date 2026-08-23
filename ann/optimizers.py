@@ -135,131 +135,131 @@ class RMSprop(Optimizer):
         self.state[l_id]['s_W'] = s_W
         self.state[l_id]['s_b'] = s_b
     
-# # Adam (Adaptive Moment Estimation)
-# class Adam(Optimizer):
-#     ''' beta1: exponential decay rate for the first moment estimates (0.9 is common),
-#         beta2: exponential decay rate for the second moment estimates (0.999 is common),
-#         epsilon: small constant to avoid division by zero (1e-8 is set as default),
-#         learning_rate: step size for parameter updates '''
+# Adam (Adaptive Moment Estimation)
+class Adam(Optimizer):
+    ''' beta1: exponential decay rate for the first moment estimates (0.9 is common),
+        beta2: exponential decay rate for the second moment estimates (0.999 is common),
+        epsilon: small constant to avoid division by zero (1e-8 is set as default),
+        learning_rate: step size for parameter updates '''
 
-#     def __init__(self, learning_rate=0.01, beta1=0.9, beta2=0.999, epsilon=1e-8):
-#         self.learning_rate = learning_rate
-#         self.beta1 = beta1 # Exponential decay rate for the first moment estimates
-#         self.beta2 = beta2 # Exponential decay rate for the second moment estimates
-#         self.epsilon = epsilon 
-#         self.state = {} # To store first and second moment estimates for each layer
+    def __init__(self, learning_rate=0.01, beta1=0.9, beta2=0.999, epsilon=1e-8):
+        self.learning_rate = learning_rate
+        self.beta1 = beta1 # Exponential decay rate for the first moment estimates
+        self.beta2 = beta2 # Exponential decay rate for the second moment estimates
+        self.epsilon = epsilon 
+        self.state = {} # To store first and second moment estimates for each layer
         
-#     def update(self, layer):
-#         if not hasattr(layer, 'W'):
-#             return
+    def update(self, layer):
+        if not hasattr(layer, 'W'):
+            return
         
-#         l_id = id(layer)
-#         if l_id not in self.state:
-#             self.state[l_id] = {
-#                 'm_W': np.zeros_like(layer.grad_W), 
-#                 'v_W': np.zeros_like(layer.grad_W),
-#                 'm_b': np.zeros_like(layer.grad_b), 
-#                 'v_b': np.zeros_like(layer.grad_b), 
-#                 't': 0
-#                 }
+        l_id = id(layer)
+        if l_id not in self.state:
+            self.state[l_id] = {
+                'm_W': np.zeros_like(layer.grad_W), 
+                'v_W': np.zeros_like(layer.grad_W),
+                'm_b': np.zeros_like(layer.grad_b), 
+                'v_b': np.zeros_like(layer.grad_b), 
+                't': 0
+                }
 
-#         s = self.state[l_id]
+        s = self.state[l_id]
 
-#         # Retrieve current first and second moment estimates
-#         m_W = s['m_W']
-#         m_b = s['m_b']
-#         v_W = s['v_W']
-#         v_b = s['v_b']
+        # Retrieve current first and second moment estimates
+        m_W = s['m_W']
+        m_b = s['m_b']
+        v_W = s['v_W']
+        v_b = s['v_b']
 
-#         # Update time step
-#         s['t'] += 1
-#         t = s['t']
+        # Update time step
+        s['t'] += 1
+        t = s['t']
 
-#         # Update biased first moment estimates
-#         m_W = self.beta1 * m_W + (1 - self.beta1) * layer.grad_W
-#         m_b = self.beta1 * m_b + (1 - self.beta1) * layer.grad_b
+        # Update biased first moment estimates
+        m_W = self.beta1 * m_W + (1 - self.beta1) * layer.grad_W
+        m_b = self.beta1 * m_b + (1 - self.beta1) * layer.grad_b
 
-#         # Update biased second moment estimates
-#         v_W = self.beta2 * v_W + (1 - self.beta2) * (layer.grad_W ** 2)
-#         v_b = self.beta2 * v_b + (1 - self.beta2) * (layer.grad_b ** 2)
+        # Update biased second moment estimates
+        v_W = self.beta2 * v_W + (1 - self.beta2) * (layer.grad_W ** 2)
+        v_b = self.beta2 * v_b + (1 - self.beta2) * (layer.grad_b ** 2)
 
-#         # Compute bias-corrected first and second moment estimates
-#         m_W_hat = m_W / (1 - self.beta1 ** t)
-#         m_b_hat = m_b / (1 - self.beta1 ** t)
-#         v_W_hat = v_W / (1 - self.beta2 ** t)
-#         v_b_hat = v_b / (1 - self.beta2 ** t)
+        # Compute bias-corrected first and second moment estimates
+        m_W_hat = m_W / (1 - self.beta1 ** t)
+        m_b_hat = m_b / (1 - self.beta1 ** t)
+        v_W_hat = v_W / (1 - self.beta2 ** t)
+        v_b_hat = v_b / (1 - self.beta2 ** t)
 
-#         # Update parameters using Adam update rule
-#         layer.W -= self.learning_rate * m_W_hat / (np.sqrt(v_W_hat) + self.epsilon)
-#         layer.b -= self.learning_rate * m_b_hat / (np.sqrt(v_b_hat) + self.epsilon)
+        # Update parameters using Adam update rule
+        layer.W -= self.learning_rate * m_W_hat / (np.sqrt(v_W_hat) + self.epsilon)
+        layer.b -= self.learning_rate * m_b_hat / (np.sqrt(v_b_hat) + self.epsilon)
 
-#         # Save updated first and second moment estimates back to state
-#         s['m_W'] = m_W
-#         s['m_b'] = m_b
-#         s['v_W'] = v_W
-#         s['v_b'] = v_b
+        # Save updated first and second moment estimates back to state
+        s['m_W'] = m_W
+        s['m_b'] = m_b
+        s['v_W'] = v_W
+        s['v_b'] = v_b
         
 
-# # Nadam (Nesterov-accelerated Adaptive Moment Estimation)
-# class Nadam(Optimizer): 
-#     ''' beta1: exponential decay rate for the first moment estimates (0.9 is common),
-#         beta2: exponential decay rate for the second moment estimates (0.999 is common),
-#         epsilon: small constant to avoid division by zero (1e-8 is set as default),
-#         learning_rate: step size for parameter updates '''
+# Nadam (Nesterov-accelerated Adaptive Moment Estimation)
+class Nadam(Optimizer): 
+    ''' beta1: exponential decay rate for the first moment estimates (0.9 is common),
+        beta2: exponential decay rate for the second moment estimates (0.999 is common),
+        epsilon: small constant to avoid division by zero (1e-8 is set as default),
+        learning_rate: step size for parameter updates '''
 
-#     def __init__(self, learning_rate=0.01, beta1=0.9, beta2=0.999, epsilon=1e-8):
-#         self.learning_rate = learning_rate
-#         self.beta1 = beta1
-#         self.beta2 = beta2
-#         self.epsilon = epsilon
-#         self.state = {} 
+    def __init__(self, learning_rate=0.01, beta1=0.9, beta2=0.999, epsilon=1e-8):
+        self.learning_rate = learning_rate
+        self.beta1 = beta1
+        self.beta2 = beta2
+        self.epsilon = epsilon
+        self.state = {} 
         
-#     def update(self, layer):
-#         if not hasattr(layer, 'W'): 
-#             return
+    def update(self, layer):
+        if not hasattr(layer, 'W'): 
+            return
         
-#         l_id = id(layer)
-#         if l_id not in self.state:
-#             self.state[l_id] = {
-#                 'm_W': np.zeros_like(layer.grad_W), 
-#                 'v_W': np.zeros_like(layer.grad_W),
-#                 'm_b': np.zeros_like(layer.grad_b), 
-#                 'v_b': np.zeros_like(layer.grad_b),
-#                 't': 0
-#             }
+        l_id = id(layer)
+        if l_id not in self.state:
+            self.state[l_id] = {
+                'm_W': np.zeros_like(layer.grad_W), 
+                'v_W': np.zeros_like(layer.grad_W),
+                'm_b': np.zeros_like(layer.grad_b), 
+                'v_b': np.zeros_like(layer.grad_b),
+                't': 0
+            }
 
-#         s = self.state[l_id]
+        s = self.state[l_id]
 
-#         # Retrieve current first and second moment estimates
-#         m_W = s['m_W']
-#         m_b = s['m_b']
-#         v_W = s['v_W']
-#         v_b = s['v_b']
+        # Retrieve current first and second moment estimates
+        m_W = s['m_W']
+        m_b = s['m_b']
+        v_W = s['v_W']
+        v_b = s['v_b']
 
-#         # Update time step
-#         s['t'] += 1
-#         t = s['t']
+        # Update time step
+        s['t'] += 1
+        t = s['t']
 
-#         # Update biased first and second moment estimates
-#         m_W = self.beta1 * m_W + (1 - self.beta1) * layer.grad_W
-#         m_b = self.beta1 * m_b + (1 - self.beta1) * layer.grad_b
-#         v_W = self.beta2 * v_W + (1 - self.beta2) * (layer.grad_W ** 2)
-#         v_b = self.beta2 * v_b + (1 - self.beta2) * (layer.grad_b ** 2)
+        # Update biased first and second moment estimates
+        m_W = self.beta1 * m_W + (1 - self.beta1) * layer.grad_W
+        m_b = self.beta1 * m_b + (1 - self.beta1) * layer.grad_b
+        v_W = self.beta2 * v_W + (1 - self.beta2) * (layer.grad_W ** 2)
+        v_b = self.beta2 * v_b + (1 - self.beta2) * (layer.grad_b ** 2)
 
-#         # Compute bias-corrected first moment estimates with Nesterov lookahead
-#         m_W_hat = self.beta1 * (m_W / (1 - self.beta1 ** t)) + ((1 - self.beta1) * layer.grad_W / (1 - self.beta1 ** t))
-#         m_b_hat = self.beta1 * (m_b / (1 - self.beta1 ** t)) + ((1 - self.beta1) * layer.grad_b / (1 - self.beta1 ** t))
+        # Compute bias-corrected first moment estimates with Nesterov lookahead
+        m_W_hat = self.beta1 * (m_W / (1 - self.beta1 ** t)) + ((1 - self.beta1) * layer.grad_W / (1 - self.beta1 ** t))
+        m_b_hat = self.beta1 * (m_b / (1 - self.beta1 ** t)) + ((1 - self.beta1) * layer.grad_b / (1 - self.beta1 ** t))
 
-#         # Compute bias-corrected second moment estimates
-#         v_W_hat = v_W / (1 - self.beta2 ** t)
-#         v_b_hat = v_b / (1 - self.beta2 ** t)
+        # Compute bias-corrected second moment estimates
+        v_W_hat = v_W / (1 - self.beta2 ** t)
+        v_b_hat = v_b / (1 - self.beta2 ** t)
 
-#         # Update parameters using Nadam update rule
-#         layer.W -= self.learning_rate * m_W_hat / (np.sqrt(v_W_hat) + self.epsilon)
-#         layer.b -= self.learning_rate * m_b_hat / (np.sqrt(v_b_hat) + self.epsilon)
+        # Update parameters using Nadam update rule
+        layer.W -= self.learning_rate * m_W_hat / (np.sqrt(v_W_hat) + self.epsilon)
+        layer.b -= self.learning_rate * m_b_hat / (np.sqrt(v_b_hat) + self.epsilon)
 
-#         # Save updated first and second moment estimates back to state
-#         s['m_W'] = m_W
-#         s['m_b'] = m_b  
-#         s['v_W'] = v_W
-#         s['v_b'] = v_b
+        # Save updated first and second moment estimates back to state
+        s['m_W'] = m_W
+        s['m_b'] = m_b  
+        s['v_W'] = v_W
+        s['v_b'] = v_b
