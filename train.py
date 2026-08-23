@@ -45,9 +45,9 @@ def get_optimizer(name, lr):
     elif name == 'momentum': return Momentum(learning_rate=lr)
     elif name == 'nag': return Nesterov(learning_rate=lr)
     elif name == 'rmsprop': return RMSprop(learning_rate=lr)
-    # elif name == 'adam': return Adam(learning_rate=lr)
-    # elif name == 'nadam': return Nadam(learning_rate=lr)
-    raise ValueError("Invalid optimizer choose from 'sgd', 'momentum', 'nag' or 'rmsprop'")
+    elif name == 'adam': return Adam(learning_rate=lr)
+    elif name == 'nadam': return Nadam(learning_rate=lr)
+    raise ValueError("Invalid optimizer choose from 'sgd', 'momentum', 'nag', 'rmsprop', 'adam', 'nadam'")
 
 def run_name(args):
     '''Generates a descriptive run name based on the hyperparameters for better organization in W&B'''
@@ -204,14 +204,14 @@ def train(model, optimizer, x_train, y_train, x_val, y_val, args):
             with open("best_config.json", "w") as f:
                 json.dump(vars(args), f, indent=4)
 
-# main function to parse arguments, load data, build model, and start training
+# main function to parse arguments, load data, build model, and start training, the default values here are of the best model got during hyperparameter sweep.
 def parse_arguments(args=None):
     parser = argparse.ArgumentParser(description="Train a Neural Network from scratch")
     parser.add_argument('-d', '--dataset', type=str, default='mnist', choices=['mnist', 'fashion_mnist'])
     parser.add_argument('-e', '--epochs', type=int, default=20)
     parser.add_argument('-b', '--batch_size', type=int, default=128)
     parser.add_argument('-l', '--loss', type=str, default='cross_entropy', choices=['cross_entropy', 'mse'])
-    parser.add_argument('-o', '--optimizer', type=str, default='rmsprop', choices=['sgd', 'momentum', 'nag', 'rmsprop'])
+    parser.add_argument('-o', '--optimizer', type=str, default='rmsprop', choices=['sgd', 'momentum', 'nag', 'rmsprop', 'adam', 'nadam'])
     parser.add_argument('-lr', '--learning_rate', type=float, default=0.001818)
     parser.add_argument('-wd', '--weight_decay', type=float, default=0.00050751)
     parser.add_argument('-nhl', '--num_layers', type=int, default=2)
