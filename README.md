@@ -2,7 +2,8 @@
 
 A fully-connected feedforward neural network (MLP) implemented **entirely from scratch in NumPy**; no PyTorch, TensorFlow, or Keras for the model itself. Forward passes, backpropagation, and every optimizer update rule are hand-derived and hand-coded. Keras is used only to load the raw MNIST & Fashion-MNIST datasets.
 
-🔗 [W&B Experiment Report](https://wandb.ai/prasid-indian-institute-of-technology-madras/assignment_1/reports/DA6401-Assignment-1-PH21B007-PRASID--VmlldzoxNjEyODA5Ng?accessToken=7lf6abidol3880zy7aiflc38domgwf0gtrwlsqz0fhboc9dumm1bdqjfn0fs1042) &nbsp;|&nbsp; 🔗 [GitHub Repo](https://github.com/4prasid/MLP-from-scratch)
+🔗 [W&B Report](https://forge.coreweave.com/wandb/prasid-indian-institute-of-technology-madras/assignment_1/reports/DA6401-Assignment-1-PH21B007-PRASID--VmlldzoxNjEyODA5Ng?accessToken=7lf6abidol3880zy7aiflc38domgwf0gtrwlsqz0fhboc9dumm1bdqjfn0fs1042) &nbsp;|&nbsp; 🔗 [GitHub Repo](https://github.com/4prasid/MLP-from-scratch)
+
 
 ---
 
