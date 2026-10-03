@@ -92,12 +92,6 @@ The `NeuralNetwork` class manages a list of layers and provides:
 ### Installation
 
 ```bash
-pip install -r requirements.txt
-```
-
-Or manually:
-
-```bash
 pip install numpy scikit-learn wandb keras tensorflow matplotlib
 ```
 
