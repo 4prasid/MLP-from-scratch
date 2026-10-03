@@ -1,4 +1,4 @@
-# MLP From Scratch — NumPy Neural Network on MNIST & Fashion-MNIST
+# MLP From Scratch - NumPy Neural Network on MNIST & Fashion-MNIST
 
 A fully-connected feedforward neural network (MLP) implemented **entirely from scratch in NumPy**; no PyTorch, TensorFlow, or Keras for the model itself. Forward passes, backpropagation, and every optimizer update rule are hand-derived and hand-coded. Keras is used only to load the raw MNIST & Fashion-MNIST datasets.
 
@@ -218,10 +218,31 @@ Per-epoch metrics tracked:
 - `train_loss`, `val_loss`
 - `train_accuracy`, `val_accuracy`
 - `val_f1_score` (macro, used as sweep objective)
-- `total_dead_neurons`, `layer_<i>_dead_count` — dead ReLU neuron counts
-- `grad_norm_L1` — L1 gradient norm of the first layer
-- `neuron_<n>_grad` — per-neuron gradient values for the first 5 neurons, logged for the first 50 steps
+- `total_dead_neurons`, `layer_<i>_dead_count` - dead ReLU neuron counts
+- `grad_norm_L1` - L1 gradient norm of the first layer
+- `neuron_<n>_grad` - per-neuron gradient values for the first 5 neurons, logged for the first 50 steps
 - Sample images table (5 images per class) at the start of each run
+
+---
+
+## Findings
+
+The W&B report goes beyond training logs, it documents a structured investigation into *why* the model behaves the way it does. Summary of what was explored (full plots and derivations in the linked report & `Findings.md`):
+
+| Investigation | Setup | Key Finding |
+|---|---|---|
+| **Class Similarity & Visual Overlap** | 5 sample images per class logged to a W&B table | Digit pairs 4/9, 3/5, and 2/8 show significant pixel-space overlap due to shared curves/strokes; since the MLP operates on raw flattened pixels with no spatial feature extraction, this overlap directly causes confident misclassifications. |
+| **Hyperparameter Sweep** | 100-run Bayesian sweep (optimizer, loss, architecture, learning rate, init, weight decay) maximizing `val_f1_score` | Best val F1 = **0.9775** (RMSprop, 2×128 ReLU, lr=0.001818, Xavier init, cross-entropy, wd=0.00050751). Optimizer choice had the single largest impact - RMSprop runs consistently outperformed others - followed by loss function (cross-entropy > MSE). Architecture size (depth/width/batch size) had near-zero importance. |
+| **Optimizer Comparison** | SGD, Momentum, NAG, RMSprop on identical 3×128 ReLU architecture, 10 epochs | RMSprop converged from epoch 1, reaching 97.3% val accuracy and 0.032 train loss by epoch 10; SGD, Momentum, and NAG all stayed stuck above 2.0 loss. RMSprop's per-parameter adaptive scaling handles the highly variable gradient magnitudes of sparse pixel inputs far better than a fixed learning rate. |
+| **Vanishing Gradients: Sigmoid vs. ReLU** | RMSprop + Xavier, ReLU vs. Sigmoid at 2 and 4 hidden layers, gradient norms logged for layer 1 | Confirmed vanishing gradients with Sigmoid: 4-layer Sigmoid gradient norms collapsed to ~0.00004–0.002 (val accuracy stuck near random chance, ~10%, for several epochs), while ReLU held healthy norms (0.004–0.008) at both depths and converged to ~97%. |
+| **Dead Neuron Investigation** | ReLU at a high learning rate (0.1) vs. ReLU at normal lr vs. Tanh, same architecture | At lr=0.1, ReLU lost ~90% of neurons (348/384) as permanently dead by epoch 2, flatlining val accuracy at ~10%. Tanh at the same high lr showed zero dead neurons (its derivative is always positive) but still failed to converge - its failure mode is gradient-killing *saturation*, not neuron death. ReLU at normal lr (0.001818) showed zero dead neurons and converged to ~97%. |
+| **Loss Function Comparison** | Cross-entropy vs. MSE, identical architecture/optimizer/learning rate | Cross-entropy converged faster and higher: ~97.3% vs. ~96.5% val accuracy by epoch 10. Cross-entropy's gradient with softmax simplifies to `(predicted − true)`, a clean, strong error signal, whereas MSE's gradient involves the full softmax Jacobian and penalizes confident wrong predictions far less aggressively. |
+| **Generalization Gap Analysis** | Train vs. test accuracy scatter across all 100 sweep runs, colored by learning rate | No severe overfitting observed - high-performing runs cluster tightly along the diagonal (train ≈ val ≈ 90%+). A middle cluster (60–80% accuracy) reflects underfitting/slow convergence, not overfitting, given MNIST's size (48k samples) relative to the capped 128-neuron width. |
+| **Error Analysis** | Confusion matrix + "most confident failures" on the best model, MNIST test set (10,000 samples) | 9,793/10,000 correct. Top confusions: 9→4 (12 cases), 5→3 (10), 2→7 (8) ; consistent with the visual-similarity findings above. The 5 most confident wrong predictions all exceeded 99% confidence (e.g. an unusually cursive "8" predicted as "4" at 99.82%), showing the model is confidently misled by atypical handwriting rather than simply uncertain. |
+| **Weight Initialization & Symmetry Breaking** | Zero init vs. Xavier init, per-neuron gradients for 5 neurons tracked over 50 iterations | Zero init produced perfectly overlapping gradient lines for all 5 neurons (mathematically equivalent to a single neuron per layer) and never escaped ~10% accuracy. Xavier init broke symmetry immediately, 5 clearly distinct gradient trajectories, and reached 85% accuracy within 5 epochs, confirming symmetry breaking is a mathematical prerequisite for an MLP to function. |
+| **Fashion-MNIST Transfer Challenge** | 3 configs chosen from MNIST learnings, budget-constrained | The best MNIST config (RMSprop, ReLU, 2×128, Xavier, cross-entropy) transferred best to Fashion-MNIST too (~90% val accuracy), confirming the core optimizer/loss/init choices generalize across datasets - though all configs showed more oscillation and a lower ceiling (~88–90% vs. MNIST's 97%+), reflecting Fashion-MNIST's greater inter-class visual overlap (sleeves, collars, textures) that a spatially-blind MLP struggles to separate. |
+
+Full plots, equations, and detailed reasoning for each investigation are in the [W&B report](https://wandb.ai/prasid-indian-institute-of-technology-madras/assignment_1/reports/DA6401-Assignment-1-PH21B007-PRASID--VmlldzoxNjEyODA5Ng?accessToken=7lf6abidol3880zy7aiflc38domgwf0gtrwlsqz0fhboc9dumm1bdqjfn0fs1042) (and `Findings.md` in this repo).
 
 ---
 
