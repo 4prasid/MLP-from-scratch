@@ -2,8 +2,7 @@
 
 A fully-connected feedforward neural network (MLP) implemented **entirely from scratch in NumPy**; no PyTorch, TensorFlow, or Keras for the model itself. Forward passes, backpropagation, and every optimizer update rule are hand-derived and hand-coded. Keras is used only to load the raw MNIST & Fashion-MNIST datasets.
 
-🔗 [W&B Report](https://forge.coreweave.com/wandb/prasid-indian-institute-of-technology-madras/assignment_1/reports/DA6401-Assignment-1-PH21B007-PRASID--VmlldzoxNjEyODA5Ng?accessToken=7lf6abidol3880zy7aiflc38domgwf0gtrwlsqz0fhboc9dumm1bdqjfn0fs1042) &nbsp;|&nbsp; 🔗 [GitHub Repo](https://github.com/4prasid/MLP-from-scratch)
-
+**📊 [Interactive W&B report](https://forge.coreweave.com/wandb/prasid-indian-institute-of-technology-madras/assignment_1/reports/DA6401-Assignment-1-PH21B007-PRASID--VmlldzoxNjEyODA5Ng?accessToken=7lf6abidol3880zy7aiflc38domgwf0gtrwlsqz0fhboc9dumm1bdqjfn0fs1042)**
 
 ---
 
@@ -245,7 +244,9 @@ Full plots, equations, and detailed reasoning for each investigation are in the 
 Built using concepts taught in the course *DA6401: Introduction to Deep Learning* (IIT Madras).
 
 Part of a deep learning project series:
-[MLP from Scratch](https://github.com/4prasid/MLP-from-scratch) · Multi-task Vision (VGG11) · Transformer NMT
+[MLP from Scratch](https://github.com/4prasid/MLP-from-scratch) · [Multi-task Vision](https://github.com/4prasid/multitask-vision-vgg11) · [Transformer NMT](https://github.com/4prasid/transformer-nmt-from-scratch)
+
+---
 
 ## License
 
