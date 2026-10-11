@@ -19,11 +19,12 @@ A fully-connected feedforward neural network (MLP) implemented **entirely from s
 
 ```
 MLP-from-scratch/
-├── train.py               # Main training script with CLI argument parsing
-├── sweep.py                # W&B Bayesian hyperparameter sweep setup
+├── train.py                 # Main training script with CLI argument parsing
+├── sweep.py                 # W&B Bayesian hyperparameter sweep setup
 ├── inference.py             # Evaluation on test set + confusion matrix + failure analysis
 ├── best_config.json         # Best hyperparameter configuration found via sweep
 ├── best_model.npy           # Saved weights of the best-trained model
+├── FINDINGS.md              # Full written analysis of the experiments
 ├── __init__.py
 ├── ann/
 │   ├── activations.py       # ReLU, Sigmoid, Tanh, Softmax
@@ -31,9 +32,10 @@ MLP-from-scratch/
 │   ├── neural_network.py    # NeuralNetwork: forward, backward, weight update, save/load
 │   ├── optimizers.py        # SGD, Momentum, NAG, RMSprop, Adam & Nadam implemented
 │   └── __init__.py
-└── utils/
-    ├── data_loader.py       # Dataset loading, preprocessing, one-hot encoding, W&B image logging
-    └── __init__.py
+├── utils/
+│   ├── data_loader.py       # Dataset loading, preprocessing, one-hot encoding, W&B image logging
+│    └── __init__.py
+└── LICENSE
 ```
 
 ---
